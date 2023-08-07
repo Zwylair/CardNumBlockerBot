@@ -1,0 +1,10 @@
+2023-07-27 21:43:23,752 - simple_example - DEBUG - debug message
+2023-07-27 21:43:23,753 - simple_example - INFO - info message
+2023-07-27 21:43:23,753 - simple_example - WARNING - warn message
+2023-07-27 21:43:23,753 - simple_example - ERROR - error message
+2023-07-27 21:43:23,753 - simple_example - CRITICAL - critical message
+2023-07-27 21:43:39,923 - simple_example - DEBUG - debug message
+2023-07-27 21:43:39,924 - simple_example - INFO - info message
+2023-07-27 21:43:39,924 - simple_example - WARNING - warn message
+2023-07-27 21:43:39,924 - simple_example - ERROR - error message
+2023-07-27 21:43:39,924 - simple_example - CRITICAL - critical message
