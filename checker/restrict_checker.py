@@ -19,14 +19,16 @@ async def check_for_ban_words(message: aiogram.types.Message, bot: aiogram.Bot):
             try:
                 await bot.ban_chat_member(message.chat.id, message.from_user.id)  # maybe revoke_messages=True ??
                 await message.delete()
-                await bot.send_message(message.chat.id, f'{funcs.get_str_user(message.from_user)} was banned :)', parse_mode='markdown')
+                await bot.send_message(message.chat.id, f'{funcs.get_str_user(message.from_user)} был забанен из-за бан-ворда', parse_mode='markdown')
 
                 logger.info(f'{funcs.get_str_user(message.from_user)} was banned using ban-word')
-                return True  # return True to stop checking the message
             except aiogram.exceptions.CantRestrictChatOwner:
-                await bot.send_message(message.chat.id, "I can't ban chat owner!")
+                await bot.send_message(message.chat.id, "Я не могу банить овнера!")
                 logger.info(f"{funcs.get_str_user(message.from_user)} cannot be banned (chat owner)")
-                return True  # return True to stop checking the message
+            except aiogram.exceptions.UserIsAnAdministratorOfTheChat:
+                await bot.send_message(message.chat.id, "Я не могу мьютить администратора!")
+                logger.info(f"{funcs.get_str_user(message.from_user)} cannot be banned (chat admin)")
+            return True  # return True to stop checking the message
     else:
         return False  # return False to continue checking the message
 
@@ -46,16 +48,20 @@ async def check_for_chat_mention(message: aiogram.types.Message, bot: aiogram.Bo
 
                 await bot.restrict_chat_member(message.chat.id, message.from_user.id, until_date=until_date)
                 await message.delete()
-                await bot.send_message(message.chat.id, f'{funcs.get_str_user(message.from_user)} was muted until {funcs.get_str_date(until_date)} using chat mention', parse_mode='markdown')
+                await bot.send_message(message.chat.id, f'{funcs.get_str_user(message.from_user)} был замьючен до {funcs.get_str_date(until_date)} из-за ссылки на чат', parse_mode='markdown')
 
                 logger.info(f'{funcs.get_str_user(message.from_user)} was muted until {funcs.get_str_date(until_date)} using chat mention')
                 return True  # return True to stop checking the message
-            except aiogram.exceptions.ChatNotFound:
-                pass
             except aiogram.exceptions.CantRestrictChatOwner:
-                await bot.send_message(message.chat.id, "I can't restrict chat owner!")
+                await bot.send_message(message.chat.id, "Я не могу мьютить владельца!")
                 logger.info(f"{funcs.get_str_user(message.from_user)} cannot be restricted (chat owner)")
                 return True  # return True to stop checking the message
+            except aiogram.exceptions.UserIsAnAdministratorOfTheChat:
+                await bot.send_message(message.chat.id, "Я не могу мьютить администраторов!")
+                logger.info(f"{funcs.get_str_user(message.from_user)} cannot be restricted (chat admin)")
+                return True  # return True to stop checking the message
+            except aiogram.exceptions.ChatNotFound:
+                pass
     else:
         return False  # return False to continue checking the message
 
@@ -70,11 +76,15 @@ async def check_for_mute_words(message: aiogram.types.Message, bot: aiogram.Bot)
 
                 await bot.restrict_chat_member(message.chat.id, message.from_user.id, until_date=until_date)
                 await message.delete()
-                await bot.send_message(message.chat.id, f'{funcs.get_str_user(message.from_user)} was muted until {funcs.get_str_date(until_date)} using chat mention', parse_mode='markdown')
+                await bot.send_message(message.chat.id, f'{funcs.get_str_user(message.from_user)} был замьючен до {funcs.get_str_date(until_date)} из-за мут-слова', parse_mode='markdown')
 
                 logger.info(f'{funcs.get_str_user(message.from_user)} was muted using mute-word')
             except aiogram.exceptions.CantRestrictChatOwner:
-                await bot.send_message(message.chat.id, "I can't restrict chat owner!")
+                await bot.send_message(message.chat.id, "Я не могу мьютить владельца!")
+                logger.info(f"{funcs.get_str_user(message.from_user)} cannot be restricted (chat owner)")
+            except aiogram.exceptions.UserIsAnAdministratorOfTheChat:
+                await bot.send_message(message.chat.id, "Я не могу мьютить администраторов!")
+                logger.info(f"{funcs.get_str_user(message.from_user)} cannot be restricted (chat admin)")
             return True  # return True to stop checking the message
     else:
         return False  # return False to continue checking the message
@@ -95,15 +105,15 @@ async def card_num_check(message: aiogram.types.Message, bot: aiogram.Bot):
                     until_date = datetime.now() + timedelta(days=1)
 
                     await message.chat.restrict(user.id, until_date=until_date)
-                    await bot.send_message(message.chat.id, f'{funcs.get_str_user(message.from_user)} was muted until {funcs.get_str_date(until_date)}', parse_mode='markdown')
+                    await bot.send_message(message.chat.id, f'{funcs.get_str_user(message.from_user)} был замьючен до {funcs.get_str_date(until_date)} из-за номера карты', parse_mode='markdown')
                     await message.delete()
 
                     logger.info(f'{funcs.get_str_user(message.from_user)} was muted (card number) until {funcs.get_str_date(until_date)}')
                 except aiogram.exceptions.MethodIsNotAvailable:
-                    await bot.send_message(message.chat.id, "I can't restrict, this chat isn't a supergroup!")
+                    await bot.send_message(message.chat.id, "Я не могу мьютить не в супергруппе!")
                     logger.info(f"{funcs.get_str_user(message.from_user)} cannot be restricted (chat isn't a supergroup)")
                 except aiogram.exceptions.CantRestrictChatOwner:
-                    await bot.send_message(message.chat.id, "I can't restrict owner!")
+                    await bot.send_message(message.chat.id, "Я не могу мьютить владельца!")
                     logger.info(f"{funcs.get_str_user(message.from_user)} cannot be restricted (chat owner)")
                 return True  # return True to stop checking the message
     else:
@@ -117,7 +127,7 @@ async def check_for_delete_words(message: aiogram.types.Message) -> bool:
         if delete_word in msg_text:
             await message.delete()
 
-            logger.info(f"{funcs.get_str_user(message.from_user)} message was deleted")
+            logger.info(f"{funcs.get_str_user(message.from_user)}'s message was deleted")
             return True  # return True to stop checking the message
     else:
         return False  # return False to continue checking the message

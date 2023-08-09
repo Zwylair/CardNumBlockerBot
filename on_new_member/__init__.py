@@ -1,15 +1,18 @@
 import aiogram
 import on_new_member.member_is_me
-import on_new_member.sdfkilug
+# import on_new_member.other_module
 
 
-def set_bot_to_modules(bot: aiogram.Bot):
-    member_is_me.bot = bot
-    sdfkilug.bot = bot
+funcs = [member_is_me.on_new_members]  # other_module.on_new_members
 
 
-def setup(dp: aiogram.Dispatcher, bot: aiogram.Bot):
-    set_bot_to_modules(bot)
+async def on_new_members(message: aiogram.types.Message):
+    for func in funcs:
+        await func(message)
 
-    dp.register_message_handler(member_is_me.on_new_members, content_types=aiogram.types.ContentType.NEW_CHAT_MEMBERS)
-    dp.register_message_handler(sdfkilug.on_new_members, content_types=aiogram.types.ContentType.NEW_CHAT_MEMBERS)
+
+def setup(dp: aiogram.Dispatcher, bot_arg: aiogram.Bot):
+    on_new_member.member_is_me.bot = bot_arg
+    # other_module.bot = bot_arg
+
+    dp.register_message_handler(on_new_members, content_types=aiogram.types.ContentType.NEW_CHAT_MEMBERS)

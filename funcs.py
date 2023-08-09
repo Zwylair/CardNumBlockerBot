@@ -19,3 +19,13 @@ def get_str_msg(message_text: str) -> str:
 
 def get_str_user(user: aiogram.types.User) -> str:
     return f'[{user.mention}](tg://user?id={user.id}) (`{user.id}`)'
+
+
+def get_str_chat(chat: aiogram.types.Chat) -> str:
+    return f'[{chat.full_name}](tg://resolve?domain={chat.username}) (`{chat.id}`)'
+
+
+async def get_user_from_id(bot: aiogram.Bot, user_id: int) -> aiogram.types.User:
+    user_as_chat = await bot.get_chat(user_id)
+    user_as_chat_member = await user_as_chat.get_member(user_id)
+    return user_as_chat_member.user

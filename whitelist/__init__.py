@@ -1,14 +1,13 @@
 import aiogram
-from whitelist import whitelist_add, whitelist_remove
-
-
-def set_bot_to_modules(bot: aiogram.Bot):
-    whitelist_add.bot = bot
-    whitelist_remove.bot = bot
+import whitelist.whitelist as wh
 
 
 def setup(dp: aiogram.Dispatcher, bot: aiogram.Bot):
-    set_bot_to_modules(bot)
+    wh.bot = bot
 
-    dp.register_message_handler(whitelist_add.whitelist_add, commands=['whitelist_add'])
-    dp.register_message_handler(whitelist_remove.whitelist_remove, commands=['whitelist_remove'])
+    dp.register_message_handler(wh.whitelist_command, commands=['whitelist'])
+
+    dp.register_message_handler(callback=wh.process_user_add, state=wh.AnswersForm.user_state_add)
+    dp.register_message_handler(callback=wh.process_user_remove, state=wh.AnswersForm.user_state_remove)
+    dp.register_message_handler(callback=wh.process_chat_add, state=wh.AnswersForm.chat_state_add)
+    dp.register_message_handler(callback=wh.process_chat_remove, state=wh.AnswersForm.chat_state_remove)
